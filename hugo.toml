@@ -97,6 +97,10 @@ minifyOutput = true
     name = "github"
     url = "https://github.com/allene-ha"
 
+  [[params.socialIcons]]
+    name = "linkedin"
+    url = "https://www.linkedin.com/in/jeongeun-ha"
+
   [params.cover]
     hidden = false
     hiddenInList = false
