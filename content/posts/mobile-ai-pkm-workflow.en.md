@@ -93,4 +93,6 @@ Now I use it for everything from telling Claude to "file this in my Inbox" while
 
 Typing long commands on a mobile keyboard is still uncomfortable. A Bluetooth keyboard helps. Sync conflicts can occur depending on FolderSync timing, and if Termux gets killed in the background, the session is lost. tmux provides some defense against this, but it's not perfect.
 
-A desktop is naturally more comfortable. But the point of this setup is that **you don't need one**. I finally have the environment I've been wanting to build for a long time.
+To be honest, this setup isn't a permanent solution either. Claude's Remote Control feature is maturing, and MCP integrations with mobile messengers are expanding quickly. Once it becomes stable to send commands via KakaoTalk or Telegram and have them execute automatically on a PC, there won't be much reason to run things directly in Termux. I'm using this approach largely because those tools aren't quite there yet.
+
+Still, the value was in having **something that works right now**. Getting to a working version of the environment I've been wanting to build was worth it on its own.
