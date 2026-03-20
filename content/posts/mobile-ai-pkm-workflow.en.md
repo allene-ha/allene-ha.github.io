@@ -3,29 +3,19 @@ title: "Building an AI PKM Workflow with Just a Galaxy Phone — No Server, No P
 date: 2026-03-20
 tags: ["termux", "claude-code", "obsidian", "android", "PKM", "mobile"]
 description: "How I built a fully mobile AI-powered note management workflow using Termux + Claude Code + Obsidian on a Galaxy phone, with no PC or server required."
-summary: "No PC, no server, no SSH. Just a Galaxy phone running AI that reads, writes, and organizes my notes. A Termux + Claude Code + Obsidian story."
+summary: "No PC, no server, no SSH. Just a Galaxy phone running AI that reads, writes, and organizes my notes. A Termux + Claude Code + Obsidian workflow story."
 showToc: true
 TocOpen: true
 draft: false
 ---
 
-## TL;DR
+I've wanted an environment where AI could directly read, organize, and write my notes for a long time. The kind of workflow where ideas that pop up while I'm on the move get handed off to AI right away, connected to existing notes, and shaped into something useful. But most guides I found assumed SSH access or a desktop setup. It always came down to needing a laptop, and that disconnect — ideas surfacing on mobile with no path to my knowledge base — kept bothering me.
 
-I built a workflow on a Galaxy phone where AI reads, writes, and organizes my notes using Termux + Claude Code + FolderSync + Obsidian. **No PC, no server, no SSH.**
+Since I couldn't find a way to run it directly on a phone, I decided to build one myself.
 
-## Why I Built This
+## The Setup
 
-I've wanted an environment where AI directly reads, organizes, and writes my notes for a long time. But every guide I found came with strings attached:
-
-- "SSH into your Mac..."
-- "Run this on your desktop"
-- "You need to spin up a server"
-
-It always came back to needing a PC. What I actually wanted was to **hand off thoughts to AI the moment they came to me, on my phone, while on the move.** But that always required a laptop somewhere. The constant disconnect — ideas popping up on mobile with no way to pipe them into my knowledge base — was genuinely frustrating.
-
-Nobody had figured out how to run it directly on a phone. So I built it myself.
-
-## The Final Setup
+The final configuration runs entirely on a Galaxy phone: Termux + Claude Code + FolderSync + Obsidian. No server, no PC, no SSH required.
 
 ```
 Galaxy Phone
@@ -34,13 +24,11 @@ Galaxy Phone
 └── Obsidian Mobile       →  View and edit results
 ```
 
-Server cost: $0. No PC needed. One phone, fully self-contained.
-
 ## Getting It Running
 
-### Termux + Claude Code
+### Installing Termux and Claude Code
 
-Install Termux from **F-Droid**. The Play Store version is no longer maintained.
+Termux needs to be installed from **F-Droid**, not the Play Store. The Play Store version is no longer maintained.
 
 ```bash
 pkg update && pkg upgrade
@@ -48,48 +36,34 @@ pkg install nodejs
 npm install -g @anthropic-ai/claude-code
 ```
 
-Smooth sailing up to this point.
+This part went smoothly.
 
-### The `/tmp` Problem — 3 Hours I Won't Get Back
+### Fixing the `/tmp` Permission Issue
 
-Claude Code launches fine. But every Bash tool call fails:
+Claude Code itself launched without problems, but every Bash tool call would fail:
 
 ```
 EACCES: permission denied, mkdir '/tmp/claude-10584'
 ```
 
-Android's root (`/`) filesystem is read-only, so you can't create `/tmp`. Claude Code internally hard-codes `/tmp`, meaning environment variable workarounds don't work.
+Android's root (`/`) filesystem is read-only, so `/tmp` can't be created. Since Claude Code internally hard-codes `/tmp`, environment variables like `TMPDIR` didn't help. Symlinks weren't possible for the same reason.
 
-Things I tried that didn't work:
-
-| Attempt | Result |
-|---------|--------|
-| `export TMPDIR=$PREFIX/tmp` | Claude Code references `/tmp` directly → ignored |
-| `TMPDIR=$PREFIX/tmp claude` | Same failure |
-| `ln -sf $PREFIX/tmp /tmp` | Root is read-only → can't create symlink |
-
-Environment variables didn't work. Symlinks didn't work. I was completely stuck.
-
-**The fix: `termux-chroot`**
+The solution turned out to be `termux-chroot`:
 
 ```bash
 pkg install proot
 termux-chroot
 ```
 
-`termux-chroot` creates a virtual root environment where `/tmp` appears to exist. It took 3 hours to find this. Once I did, it was embarrassingly simple.
+`termux-chroot` creates a virtual root environment where `/tmp` appears to exist. It's straightforward once you know about it, but finding it took a fair bit of searching.
 
-### Essential Packages
+### Recommended Packages
 
 ```bash
 pkg install git ripgrep tmux
 ```
 
-| Package | Why It's Needed |
-|---------|----------------|
-| **git** | AI modifies your vault, so you need rollback capability. Non-negotiable |
-| **ripgrep** | Claude Code uses it for file search. Without it, search becomes painfully slow |
-| **tmux** | Keeps sessions alive when screen turns off. Nothing works on mobile without this |
+`git` is essential because AI modifies vault files directly — you need change tracking and rollback capability. `ripgrep` is the search tool Claude Code relies on, so installing it noticeably improves performance. `tmux` keeps sessions alive when the screen turns off, which happens frequently on mobile and would otherwise interrupt work in progress.
 
 ### Connecting the Vault
 
@@ -98,33 +72,23 @@ termux-setup-storage
 git config --global --add safe.directory /storage/emulated/0/Documents/my-vault
 ```
 
-Set up two-way sync between Google Drive and local storage using FolderSync. That's it. Claude Code can now read and modify the same notes Obsidian sees.
+Setting up two-way sync between Google Drive and a local directory via FolderSync means Claude Code can immediately read and modify the same notes that Obsidian sees.
 
-### Daily Startup
+### The Two Lines I Run Every Day
 
 ```bash
-termux-chroot    # Enter chroot
-claude           # Launch Claude Code
+termux-chroot
+claude
 ```
 
-Two lines, every time.
+## How I Actually Use This
 
-## What I Actually Do With This
+What I originally wanted was never some elaborate automation. Just an environment where ideas could be captured on my phone and accumulated into my existing knowledge base — that level was enough.
 
-- An idea pops up while commuting → "Hey Claude, file this in my Inbox" — done
-- Vault structure auto-generation: folders, frontmatter, all in bulk
-- Analyze existing notes and get connection suggestions
-- Blog draft writing — this very post came out of this workflow
+Now I use it for everything from telling Claude to "file this in my Inbox" while commuting, to auto-generating vault folder structures, getting connection suggestions from existing note analysis, and drafting blog posts. This very post started from this workflow.
 
-What I wanted was never some grand 24/7 AI automation. Just an environment where ideas could be captured on my phone and accumulated into my existing knowledge base. That's exactly what this became.
+## Limitations
 
-## Honest Limitations
+Typing long commands on a mobile keyboard is still uncomfortable. A Bluetooth keyboard helps. Sync conflicts can occur depending on FolderSync timing, and if Termux gets killed in the background, the session is lost. tmux provides some defense against this, but it's not perfect.
 
-- Typing long commands on a mobile keyboard is painful. I'd recommend a Bluetooth keyboard.
-- FolderSync timing can cause sync conflicts.
-- If Termux gets killed in the background, your session is gone. tmux helps, but I forget sometimes.
-- A desktop is obviously more comfortable.
-
-But the core point is: **you don't need one.** A Galaxy phone, some debugging patience, and the willingness to try is all it takes.
-
-I finally built the thing I've been wanting to build for a long time.
+A desktop is naturally more comfortable. But the point of this setup is that **you don't need one**. I finally have the environment I've been wanting to build for a long time.
