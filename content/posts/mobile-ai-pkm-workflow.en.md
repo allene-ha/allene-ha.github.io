@@ -11,7 +11,9 @@ draft: false
 
 I've wanted an environment where AI could directly read, organize, and write my notes for a long time. The kind of workflow where ideas that pop up while I'm on the move get handed off to AI right away, connected to existing notes, and shaped into something useful. But most guides I found assumed SSH access or a desktop setup. It always came down to needing a laptop, and that disconnect — ideas surfacing on mobile with no path to my knowledge base — kept bothering me.
 
-Since I couldn't find a way to run it directly on a phone, I decided to build one myself.
+Of course, when my Mac is on, I can use a VPN like Tailscale to remote in and work that way. I actually did that for a while. But on Galaxy, turning on Tailscale breaks Samsung Pay, so I'd have to toggle the VPN off every time I wanted to tap to pay — which got annoying quickly. More fundamentally, if my Mac was off, nothing worked at all.
+
+So I decided to make it run on the phone itself.
 
 ## The Setup
 
