@@ -1,7 +1,7 @@
 ---
 title: "About"
 layout: "single"
-url: "/about/"
+url: "/en/about/"
 summary: "Jeongeun Ha (Allene Ha) — Data Engineer"
 ShowReadingTime: false
 ShowShareButtons: false
