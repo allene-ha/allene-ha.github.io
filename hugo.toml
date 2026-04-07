@@ -84,8 +84,9 @@ minifyOutput = true
       url = "/search/"
       weight = 6
 
-# ── 테마 설정 (PaperMod) ─────────────────────
+# ── 메인 섹션 (홈 + 목록에 표시할 섹션) ────────────
 [params]
+  mainSections = ["dev", "daily", "essays"]
   env = "production"
   description = "데이터 엔지니어링, AI, PKM에 대한 블로그"
   author = "Allene Ha"
